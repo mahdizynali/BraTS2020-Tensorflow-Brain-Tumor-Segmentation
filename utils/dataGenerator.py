@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import nibabel as nib
 import numpy as np
+np.set_printoptions(precision=3, suppress=True)
 from keras.utils import Sequence
 
 # lists of directories with studies

@@ -1,5 +1,12 @@
 import nibabel as nib
 
+SEGMENT_CLASSES = {
+    0 : 'NOT tumor',
+    1 : 'NECROTIC/CORE',
+    2 : 'EDEMA',
+    3 : 'ENHANCING'
+}
+
 # from tensorflow.keras.utils import plot_model
 # plot_model(model, 
 #            show_shapes = True,

@@ -5,20 +5,19 @@ from utils.dataGenerator import *
 from keras.callbacks import CSVLogger
 from tensorflow.keras import callbacks
 from utils.coEFFMatrix import machinLearningMatrix as ml
-
+hyper = HyperParameters()
 
 training_generator = DataGenerator(train_ids)
 valid_generator = DataGenerator(val_ids)
 test_generator = DataGenerator(test_ids)
 
-model = attUnet((IMG_SIZE, IMG_SIZE, 2), 'he_normal', 0.2).generateModel()
-
+model = attUnet((IMG_SIZE, IMG_SIZE, 2), hyper.modelKernel, hyper.modelDropout).generateModel()
 model.compile(
-    loss="categorical_crossentropy",
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss=hyper.lossFunction,
+    optimizer=hyper.optimizer,
     metrics=[
-        'accuracy',
-        tf.keras.metrics.MeanIoU(num_classes=4),
+        hyper.metricsBase,
+        hyper.IoU,
         ml.dice_coef,
         ml.precision,
         ml.sensitivity,
@@ -40,7 +39,7 @@ cbacks = [
 
 K.clear_session()
 
-history =  model.fit(training_generator, epochs=30, steps_per_epoch=200,
+history =  model.fit(training_generator, epochs=hyper.epochs, steps_per_epoch=hyper.steps,
                      callbacks= cbacks, validation_data = valid_generator)  
 
 model.save(SAVE_MODEL_PATH)
