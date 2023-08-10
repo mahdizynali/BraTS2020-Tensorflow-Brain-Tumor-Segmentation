@@ -1,6 +1,6 @@
-from tensorflow.keras import optimizers, metrics
 import warnings
 warnings.filterwarnings('ignore')
+from tensorflow.keras import optimizers, metrics
 
 NUM_CLASSES=4
 IMG_SIZE=128
@@ -22,4 +22,9 @@ class HyperParameters:
     modelDropout = 0.2
     metricsBase = 'accuracy'
     optimizer = optimizers.Adam(learningRate)
+    # lr_schedule = optimizers.schedules.ExponentialDecay(
+    #     initial_learning_rate=1e-2,
+    #     decay_steps=10000,
+    #     decay_rate=0.9)
+    # optimizer = optimizers.SGD(learning_rate=lr_schedule)
     IoU = metrics.MeanIoU(num_classes = NUM_CLASSES)

@@ -1,10 +1,10 @@
-from config import HyperParameters, IMG_SIZE
 import keras.backend as K
 from AttentionUnet import attUnet
 from utils.dataGenerator import *
 from keras.callbacks import CSVLogger
 from tensorflow.keras import callbacks
 from utils.coEFFMatrix import machinLearningMatrix as ml
+from config import HyperParameters, IMG_SIZE, SAVE_LOG_PATH, SAVE_MODEL_PATH
 hyper = HyperParameters()
 
 training_generator = DataGenerator(train_ids, batch_size=hyper.batchSize, n_channels=2)
