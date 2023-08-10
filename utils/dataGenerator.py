@@ -31,7 +31,7 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
 
 
 class DataGenerator(Sequence):
-    'Generates data for Keras'
+    'Generates and augment data for training'
     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
         'Initialization'
         self.dim = dim
