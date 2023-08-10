@@ -15,7 +15,7 @@ import nilearn as nl
 import nibabel as nib
 import nilearn.plotting as nlplt
 import keras
-import keras.backend as K
+
 from keras.callbacks import CSVLogger
 import tensorflow as tf
 from tensorflow.keras.utils import plot_model
@@ -26,7 +26,6 @@ from tensorflow.keras.models import *
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping, TensorBoard
 from tensorflow.keras.layers.experimental import preprocessing
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, Input, concatenate, Dropout, Activation, Attention
 
 import warnings
 warnings.filterwarnings('ignore')
