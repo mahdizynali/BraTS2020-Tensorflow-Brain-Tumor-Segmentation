@@ -7,9 +7,8 @@ from utils.coEFFMatrix import machinLearningMatrix as ml
 from config import HyperParameters, IMG_SIZE, SAVE_LOG_PATH, SAVE_MODEL_PATH
 hyper = HyperParameters()
 
-training_generator = DataGenerator(train_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
-valid_generator = DataGenerator(val_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
-test_generator = DataGenerator(test_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
+train_set = DataGenerator(train_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
+valid_set = DataGenerator(val_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
 
 model = attUnet((IMG_SIZE, IMG_SIZE, 2), hyper.modelKernel, hyper.modelDropout).generateModel()
 model.compile(
@@ -39,7 +38,7 @@ cbacks = [
 
 K.clear_session()
 
-history =  model.fit(training_generator, epochs=hyper.epochs, steps_per_epoch=hyper.steps,
-                     callbacks= cbacks, validation_data = valid_generator)  
+history =  model.fit(train_set, epochs=hyper.epochs, steps_per_epoch=hyper.steps,
+                     callbacks= cbacks, validation_data = valid_set)  
 
 model.save(SAVE_MODEL_PATH)
