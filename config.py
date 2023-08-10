@@ -1,4 +1,4 @@
-import os
+
 import cv2
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ from keras.callbacks import CSVLogger
 import tensorflow as tf
 from tensorflow.keras.utils import plot_model
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
+
 from sklearn.metrics import classification_report
 from tensorflow.keras.models import *
 from tensorflow.keras.optimizers import *
@@ -49,5 +49,7 @@ VOLUME_START_AT = 22 # first slice of volume that we will include
 
 TRAIN_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
 VALIDATION_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData/'
+PRE_TRAINED_MODEL_PATH = '/home/maximum/Desktop/tf2/first_train/model-agust.h5'
+PRE_TRAINED_LOG_PATH = '/home/maximum/Desktop/tf2/first_train/training.log'
 
 IMG_SIZE=128
