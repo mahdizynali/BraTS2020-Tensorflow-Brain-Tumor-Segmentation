@@ -1,105 +1,121 @@
-# def build_unet(inputs, ker_init, dropout):
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, Input, concatenate, Dropout, Activation, Attention
+
+# class simpleUnet:
 #     '''simple unet model'''
-#     conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(inputs)
-#     conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv1)
-    
-#     pool = MaxPooling2D(pool_size=(2, 2))(conv1)
-#     conv = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(pool)
-#     conv = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv)
-    
-#     pool1 = MaxPooling2D(pool_size=(2, 2))(conv)
-#     conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(pool1)
-#     conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv2)
-    
-#     pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-#     conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(pool2)
-#     conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv3)
-    
-    
-#     pool4 = MaxPooling2D(pool_size=(2, 2))(conv3)
-#     conv5 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(pool4)
-#     conv5 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv5)
-#     drop5 = Dropout(dropout)(conv5)
 
-#     up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(UpSampling2D(size = (2,2))(drop5))
-#     merge7 = concatenate([conv3,up7], axis = 3)
-#     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(merge7)
-#     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv7)
+#     def __init__(self, input_layer, kernel, dropout) :
+#         self.input_layer = input_layer
+#         self.kernel = kernel
+#         self.dropout = dropout
+#     def generateLayers(self):
+#         conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(self.input_layer)
+#         conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv1)
+        
+#         mxpool = Maxmxpooling2D(mxpool_size=(2, 2))(conv1)
+#         conv = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(mxpool)
+#         conv = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv)
+        
+#         mxpool1 = Maxmxpooling2D(mxpool_size=(2, 2))(conv)
+#         conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(mxpool1)
+#         conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv2)
+        
+#         mxpool2 = Maxmxpooling2D(mxpool_size=(2, 2))(conv2)
+#         conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(mxpool2)
+#         conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv3)
+        
+        
+#         mxpool4 = Maxmxpooling2D(mxpool_size=(2, 2))(conv3)
+#         conv5 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(mxpool4)
+#         conv5 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv5)
+#         drop5 = Dropout(self.dropout)(conv5)
 
-#     up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(UpSampling2D(size = (2,2))(conv7))
-#     merge8 = concatenate([conv2,up8], axis = 3)
-#     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(merge8)
-#     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv8)
+#         up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(UpSampling2D(size = (2,2))(drop5))
+#         merge7 = concatenate([conv3,up7], axis = 3)
+#         conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(merge7)
+#         conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv7)
 
-#     up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(UpSampling2D(size = (2,2))(conv8))
-#     merge9 = concatenate([conv,up9], axis = 3)
-#     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(merge9)
-#     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv9)
-    
-#     up = Conv2D(32, 2, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(UpSampling2D(size = (2,2))(conv9))
-#     merge = concatenate([conv1,up], axis = 3)
-#     conv = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(merge)
-#     conv = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = ker_init)(conv)
-    
-#     conv10 = Conv2D(4, (1,1), activation = 'softmax')(conv)
-    
-#     return Model(inputs = inputs, outputs = conv10)
+#         up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(UpSampling2D(size = (2,2))(conv7))
+#         merge8 = concatenate([conv2,up8], axis = 3)
+#         conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(merge8)
+#         conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv8)
+
+#         up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(UpSampling2D(size = (2,2))(conv8))
+#         merge9 = concatenate([conv,up9], axis = 3)
+#         conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(merge9)
+#         conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv9)
+        
+#         up = Conv2D(32, 2, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(UpSampling2D(size = (2,2))(conv9))
+#         merge = concatenate([conv1,up], axis = 3)
+#         conv = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(merge)
+#         conv = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv)
+        
+#         conv10 = Conv2D(4, (1,1), activation = 'softmax')(conv)
+        
+#         return Model(input_layer = self.input_layer, outputs = conv10)
 
 #==========================================================
 
-def build_unet_with_attention(inputs, ker_init, dropout):
-    conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=ker_init)(inputs)
-    conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv1)
+class attUnet:
+    '''Attention Unet Model'''
 
-    pool = MaxPooling2D(pool_size=(2, 2))(conv1)
-    conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=ker_init)(pool)
-    conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv)
+    def __init__(self, input_layer, kernel, dropout) :
+        self.input_layer = input_layer
+        self.kernel = kernel
+        self.dropout = dropout
 
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv)
-    conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=ker_init)(pool1)
-    conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv2)
+    def generateLayers(self):
+        conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(self.input_layer)
+        conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv1)
 
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-    conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=ker_init)(pool2)
-    conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv3)
+        mxpool = Maxmxpooling2D(mxpool_size=(2, 2))(conv1)
+        conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool)
+        conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv)
 
-    pool4 = MaxPooling2D(pool_size=(2, 2))(conv3)
-    conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=ker_init)(pool4)
-    conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv5)
-    drop5 = Dropout(dropout)(conv5)
+        mxpool1 = Maxmxpooling2D(mxpool_size=(2, 2))(conv)
+        conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool1)
+        conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv2)
 
-    up7 = Conv2D(256, 2, activation='relu', padding='same', kernel_initializer=ker_init)(
-        UpSampling2D(size=(2, 2))(drop5))
-    merge7 = concatenate([conv3, up7], axis=3)
-    att7 = Attention(use_scale=False)([conv3, up7])
-    merge7 = concatenate([att7, merge7], axis=3)
-    conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=ker_init)(merge7)
-    conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv7)
+        mxpool2 = Maxmxpooling2D(mxpool_size=(2, 2))(conv2)
+        conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool2)
+        conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv3)
 
-    up8 = Conv2D(128, 2, activation='relu', padding='same', kernel_initializer=ker_init)(
-        UpSampling2D(size=(2, 2))(conv7))
-    merge8 = concatenate([conv2, up8], axis=3)
-    att8 = Attention(use_scale=False)([conv2, up8])
-    merge8 = concatenate([att8, merge8], axis=3)
-    conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=ker_init)(merge8)
-    conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv8)
+        mxpool4 = Maxmxpooling2D(mxpool_size=(2, 2))(conv3)
+        conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool4)
+        conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv5)
+        drop5 = Dropout(self.dropout)(conv5)
 
-    up9 = Conv2D(64, 2, activation='relu', padding='same', kernel_initializer=ker_init)(
-        UpSampling2D(size=(2, 2))(conv8))
-    merge9 = concatenate([conv, up9], axis=3)
-    att9 = Attention(use_scale=False)([conv, up9])
-    merge9 = concatenate([att9, merge9], axis=3)
-    conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=ker_init)(merge9)
-    conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv9)
+        up7 = Conv2D(256, 2, activation='relu', padding='same', kernel_initializer=self.kernel)(
+            UpSampling2D(size=(2, 2))(drop5))
+        merge7 = concatenate([conv3, up7], axis=3)
+        att7 = Attention(use_scale=False)([conv3, up7])
+        merge7 = concatenate([att7, merge7], axis=3)
+        conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(merge7)
+        conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv7)
 
-    up = Conv2D(32, 2, activation='relu', padding='same', kernel_initializer=ker_init)(
-        UpSampling2D(size=(2, 2))(conv9))
-    merge = concatenate([conv1, up], axis=3)
-    att10 = Attention(use_scale=False)([conv1, up])
-    merge = concatenate([att10, merge], axis=3)
-    conv = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=ker_init)(merge)
-    conv = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=ker_init)(conv)
+        up8 = Conv2D(128, 2, activation='relu', padding='same', kernel_initializer=self.kernel)(
+            UpSampling2D(size=(2, 2))(conv7))
+        merge8 = concatenate([conv2, up8], axis=3)
+        att8 = Attention(use_scale=False)([conv2, up8])
+        merge8 = concatenate([att8, merge8], axis=3)
+        conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(merge8)
+        conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv8)
 
-    conv10 = Conv2D(4, (1, 1), activation='softmax')(conv)
+        up9 = Conv2D(64, 2, activation='relu', padding='same', kernel_initializer=self.kernel)(
+            UpSampling2D(size=(2, 2))(conv8))
+        merge9 = concatenate([conv, up9], axis=3)
+        att9 = Attention(use_scale=False)([conv, up9])
+        merge9 = concatenate([att9, merge9], axis=3)
+        conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(merge9)
+        conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv9)
 
-    return tf.keras.Model(inputs=inputs, outputs=conv10)
+        up = Conv2D(32, 2, activation='relu', padding='same', kernel_initializer=self.kernel)(
+            UpSampling2D(size=(2, 2))(conv9))
+        merge = concatenate([conv1, up], axis=3)
+        att10 = Attention(use_scale=False)([conv1, up])
+        merge = concatenate([att10, merge], axis=3)
+        conv = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(merge)
+        conv = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv)
+
+        conv10 = Conv2D(4, (1, 1), activation='softmax')(conv)
+
+        return tf.keras.Model(input_layer = self.input_layer, outputs = conv10)
