@@ -1,11 +1,17 @@
 import os
-from config import *
+import cv2
+from config import TRAIN_DATASET_PATH, VALIDATION_DATASET_PATH, IMG_SIZE
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import nibabel as nib
 import numpy as np
 np.set_printoptions(precision=3, suppress=True)
 from keras.utils import Sequence
+
+# there are 155 slices per volume
+# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
+VOLUME_SLICES = 100 
+VOLUME_START_AT = 22 # first slice of volume that we will include
 
 # lists of directories with studies
 train_and_val_directories = [f.path for f in os.scandir(TRAIN_DATASET_PATH) if f.is_dir()]
@@ -71,7 +77,7 @@ train_ids, test_ids = train_test_split(train_test_ids,test_size=0.15)
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
+    def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 16, n_channels = 2, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
