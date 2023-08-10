@@ -38,5 +38,7 @@ TRAIN_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_TrainingD
 VALIDATION_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_ValidationData/'
 PRE_TRAINED_MODEL_PATH = '/home/mahdi/Desktop/tf2/first_train/model-agust.h5'
 PRE_TRAINED_LOG_PATH = '/home/maximum/Desktop/tf2/first_train/training.log'
+SAVE_MODEL_PATH = 'result-model.h5'
+SAVE_LOG_PATH = 'training.log'
 
 IMG_SIZE=128

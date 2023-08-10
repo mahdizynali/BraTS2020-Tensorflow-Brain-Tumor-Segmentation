@@ -29,7 +29,7 @@ model.compile(
     ]
 )
 
-csv_logger = CSVLogger('training.log', separator=',', append=False)
+csv_logger = CSVLogger(SAVE_LOG_PATH, separator=',', append=False)
 cbacks = [
 #     callbacks.EarlyStopping(monitor='loss', min_delta=0,
 #                               patience=2, verbose=1, mode='auto'),
@@ -43,4 +43,4 @@ K.clear_session()
 history =  model.fit(training_generator, epochs=30, steps_per_epoch=200,
                      callbacks= cbacks, validation_data = valid_generator)  
 
-model.save("result-model.h5")
+model.save(SAVE_MODEL_PATH)
