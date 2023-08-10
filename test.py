@@ -1,47 +1,4 @@
-import os
-import cv2
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import glob
-import matplotlib.pyplot as plt
-from skimage import data
-from skimage.util import montage 
-import skimage.transform as skTrans
-from skimage.transform import rotate
-from skimage.transform import resize
-from PIL import Image, ImageOps  
-
-# neural imaging
-import nilearn as nl
-import nibabel as nib
-import nilearn.plotting as nlplt
-
-
-# ml libs
-import keras
-import keras.backend as K
-from keras.callbacks import CSVLogger
-import tensorflow as tf
-from tensorflow.keras.utils import plot_model
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping, TensorBoard
-from tensorflow.keras.layers.experimental import preprocessing
-
-
-# Make numpy printouts easier to read.
-np.set_printoptions(precision=3, suppress=True)
-
-import warnings
-warnings.filterwarnings('ignore')
-
-
-
+import config
 
 # DEFINE seg-areas  
 SEGMENT_CLASSES = {
@@ -57,8 +14,8 @@ VOLUME_SLICES = 100
 VOLUME_START_AT = 22 # first slice of volume that we will include
 
 
-TRAIN_DATASET_PATH = '/media/mahdi/individual/dataset/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
-VALIDATION_DATASET_PATH = '/media/mahdi/individual/dataset/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData/'
+TRAIN_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
+VALIDATION_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData/'
 
 # test_image_flair=nib.load(TRAIN_DATASET_PATH + 'BraTS20_Training_001/BraTS20_Training_001_flair.nii').get_fdata()
 # test_image_t1=nib.load(TRAIN_DATASET_PATH + 'BraTS20_Training_001/BraTS20_Training_001_t1.nii').get_fdata()
@@ -479,7 +436,7 @@ K.clear_session()
 
 
 ############ load trained model ################
-model = keras.models.load_model('model-agust.h5', 
+model = keras.models.load_model('/home/maximum/Desktop/tf2/first_train/model-agust.h5', 
                                    custom_objects={ 'accuracy' : tf.keras.metrics.MeanIoU(num_classes=4),
                                                    "dice_coef": dice_coef,
                                                    "precision": precision,
@@ -490,7 +447,7 @@ model = keras.models.load_model('model-agust.h5',
                                                    "dice_coef_enhancing": dice_coef_enhancing
                                                   }, compile=False)
 
-history = pd.read_csv('/home/mahdi/Desktop/tf2/training.log', sep=',', engine='python')
+history = pd.read_csv('/home/maximum/Desktop/tf2/first_train/training.log', sep=',', engine='python')
 
 hist=history
 
@@ -588,7 +545,7 @@ def predictByPath(case_path,case):
 
 
 def showPredictsById(case, start_slice = 50):
-    path = f"/media/mahdi/individual/dataset/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/BraTS20_Training_{case}"
+    path = f"/home/maximum/Desktop/tf2/archive/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/BraTS20_Training_{case}"
     gt = nib.load(os.path.join(path, f'BraTS20_Training_{case}_seg.nii')).get_fdata()
     origImage = nib.load(os.path.join(path, f'BraTS20_Training_{case}_flair.nii')).get_fdata()
     p = predictByPath(path,case)
@@ -640,4 +597,3 @@ showPredictsById(case=test_ids[2][-3:])
 # plt.imshow(im, 'gray', interpolation='none')
 # plt.imshow(masked, 'jet', interpolation='none', alpha=0.7)
 # plt.show()
-
