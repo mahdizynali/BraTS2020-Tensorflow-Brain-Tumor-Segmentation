@@ -17,7 +17,7 @@ PRE_TRAINED_LOG_PATH = '/home/maximum/Desktop/tf2/first_train/training.log'
 class HyperParameters:
     lossFunction = "categorical_crossentropy"
     learningRate = 0.001
-    batchSize = 1
+    batchSize = 1 # approximatelly allocate 10gb of memory
     epochs = 30
     steps = 200 # trainSize / batchSize
     modelKernel = 'he_normal'
