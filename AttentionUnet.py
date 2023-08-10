@@ -1,11 +1,13 @@
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, concatenate, Dropout, Activation, Attention
-import tensorflow.keras as tfk
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Dropout, Activation, Attention
+from tensorflow.keras.models import Model
 
 
-# class simpleUnet:
+
+# class simpleUnet(Model):
 #     '''simple unet model'''
 
-#     def __init__(self, input_layer, kernel, dropout) :
+    # def __init__(self, input_layer, kernel, dropout):
+    #     super(attUnet, self).__init__()
 #         self.input_layer = input_layer
 #         self.kernel = kernel
 #         self.dropout = dropout
@@ -53,21 +55,22 @@ import tensorflow.keras as tfk
         
 #         conv10 = Conv2D(4, (1,1), activation = 'softmax')(conv)
         
-#         return Model(input_layer = self.input_layer, outputs = conv10)
+#         return Model(inputs = self.input_layer, outputs = conv10)
 
 #==========================================================
 
 class attUnet:
     '''Attention Unet Model'''
 
-    def __init__(self, input_layer, kernel, dropout) :
-        self.input_layer = input_layer
+    def __init__(self, inp, kernel, dropout):
         self.kernel = kernel
         self.dropout = dropout
-        self.generateLayers()
-
-    def generateLayers(self):
-        conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(self.input_layer)
+        self.input_layers = Input(shape=inp)
+        self.generateModel()
+        
+    def generateModel(self):
+        
+        conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(self.input_layers)
         conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv1)
 
         mxpool = MaxPooling2D(pool_size=(2, 2))(conv1)
@@ -120,5 +123,5 @@ class attUnet:
         conv = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv)
 
         conv10 = Conv2D(4, (1, 1), activation='softmax')(conv)
-
-        return tfk.Model(input_layer = self.input_layer, outputs = conv10)
+        
+        return Model(inputs = self.input_layers, outputs = conv10)

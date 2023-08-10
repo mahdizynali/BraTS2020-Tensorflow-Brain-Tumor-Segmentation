@@ -3,22 +3,16 @@ import keras.backend as K
 from AttentionUnet import attUnet
 from utils.dataGenerator import *
 from keras.callbacks import CSVLogger
-from tensorflow.keras import layers, callbacks
+from tensorflow.keras import callbacks
 from utils.coEFFMatrix import machinLearningMatrix as ml
-
-# from sklearn.preprocessing import MinMaxScaler
-# from sklearn.metrics import classification_report
-# from tensorflow.keras.models import *
 
 
 training_generator = DataGenerator(train_ids)
 valid_generator = DataGenerator(val_ids)
 test_generator = DataGenerator(test_ids)
 
-input_layer = layers.Input((IMG_SIZE, IMG_SIZE, 2))
+model = attUnet((IMG_SIZE, IMG_SIZE, 2), 'he_normal', 0.2).generateModel()
 
-model = attUnet(input_layer, 'he_normal', 0.2)
-print(type(model))
 model.compile(
     loss="categorical_crossentropy",
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
