@@ -3,14 +3,15 @@ from tensorflow.keras.models import Model
 
 
 
-# class simpleUnet(Model):
+# class simpleUnet():
 #     '''simple unet model'''
 
-    # def __init__(self, input_layer, kernel, dropout):
-    #     super(attUnet, self).__init__()
+#     def __init__(self, inp, kernel, dropout):
 #         self.input_layer = input_layer
 #         self.kernel = kernel
 #         self.dropout = dropout
+#         self.input_layers = Input(shape=inp)
+
 #     def generateLayers(self):
 #         conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(self.input_layer)
 #         conv1 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = self.kernel)(conv1)
