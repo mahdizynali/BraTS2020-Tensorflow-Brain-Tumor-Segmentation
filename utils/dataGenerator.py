@@ -10,26 +10,22 @@ from keras.utils import Sequence
 
 # there are 155 slices per volume
 # to start at 5 and use 145 slices means we will skip the first 5 and last 5 
-VOLUME_SLICES = 100 
-VOLUME_START_AT = 22 # first slice of volume that we will include
+VOLUME_SLICES = 150
+VOLUME_START = 10 # first slice of volume that we will include
 
 # lists of directories with studies
 train_and_val_directories = [f.path for f in os.scandir(TRAIN_DATASET_PATH) if f.is_dir()]
 
-# choose dataset to train
-train_and_val_directories.remove(TRAIN_DATASET_PATH+'BraTS20_Training_300')
-
-
-def pathListIntoIds(dirList):
+def path_to_ids(dirList):
     x = []
     for i in range(0,len(dirList)):
         x.append(dirList[i][dirList[i].rfind('/')+1:])
     return x
 
-train_and_test_ids = pathListIntoIds(train_and_val_directories); 
+train_and_test_ids = path_to_ids(train_and_val_directories); 
 
-train_test_ids, val_ids = train_test_split(train_and_test_ids,test_size=0.2) 
-train_ids, test_ids = train_test_split(train_test_ids,test_size=0.15) 
+train_test_ids, val_ids = train_test_split(train_and_test_ids, test_size=0.2) 
+train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15) 
 
 
 
@@ -131,10 +127,10 @@ class DataGenerator(Sequence):
             seg = nib.load(data_path).get_fdata()
         
             for j in range(VOLUME_SLICES):
-                 X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE))
-                 X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE))
+                 X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
+                 X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
 
-                 y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT]
+                 y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START]
                     
         # Generate masks
         y[y==4] = 3
