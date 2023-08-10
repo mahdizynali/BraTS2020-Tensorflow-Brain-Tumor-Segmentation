@@ -10,7 +10,7 @@ from keras.utils import Sequence
 
 # there are 155 slices per volume
 # to start at 5 and use 145 slices means we will skip the first 5 and last 5 
-VOLUME_SLICES = 150
+VOLUME_SLICES = 140
 VOLUME_START = 10 # first slice of volume that we will include
 
 # lists of directories with studies
@@ -30,50 +30,80 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
 
 
 # from keras.preprocessing.image import ImageDataGenerator
-# class DataGenerator(keras.utils.Sequence):
-#     def __init__(self, list_IDs, dim=(IMG_SIZE, IMG_SIZE), batch_size=1, n_channels=2, shuffle=True):
+
+# class DataGenerator(Sequence):
+#     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 8, n_channels = 2, shuffle=True):
 #         self.dim = dim
 #         self.batch_size = batch_size
 #         self.list_IDs = list_IDs
 #         self.n_channels = n_channels
 #         self.shuffle = shuffle
 #         self.on_epoch_end()
-        
-#         # Initialize an ImageDataGenerator for augmentation
-#         self.data_generator = ImageDataGenerator(
-#             rotation_range=15,
+
+#     def __len__(self):
+#         return int(np.floor(len(self.list_IDs) / self.batch_size))
+
+#     def __getitem__(self, index):
+#         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+#         Batch_ids = [self.list_IDs[k] for k in indexes]
+#         X, y = self.__data_generation(Batch_ids)
+#         return X, y
+
+#     def on_epoch_end(self):
+#         self.indexes = np.arange(len(self.list_IDs))
+#         if self.shuffle == True:
+#             np.random.shuffle(self.indexes)
+
+#     def __data_generation(self, Batch_ids):
+#         X = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, self.n_channels))
+#         y = np.zeros((self.batch_size*VOLUME_SLICES, 240, 240))
+#         Y = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, 4))
+
+#         datagen = ImageDataGenerator(
+#             rotation_range=20,
 #             width_shift_range=0.1,
 #             height_shift_range=0.1,
-#             shear_range=0.1,
-#             zoom_range=0.1,
+#             shear_range=0.2,
+#             zoom_range=0.2,
 #             horizontal_flip=True,
-#             vertical_flip=True,
 #             fill_mode='nearest'
 #         )
 
-#     def __getitem__(self, index):
-#         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
-#         Batch_ids = [self.list_IDs[k] for k in indexes]
-#         X, y = self.__data_generation(Batch_ids)
+#         augmented_X = []
+#         augmented_Y = []
 
-#         return X, y
-    
-#     # Rest of the class remains the same
-    
-#     def __data_generation(self, Batch_ids):
-#         # ... (rest of the function remains the same)
-        
-#         # Apply data augmentation to X and Y
-#         X = self.data_generator.apply_transform(X, {'channel_shift_intensity': 0.2})
-#         Y = self.data_generator.apply_transform(Y, {'channel_shift_intensity': 0.2})
-        
-#         return X/np.max(X), Y
+#         for j in range(VOLUME_SLICES):
+#             for c, i in enumerate(Batch_ids):
+#                 case_path = os.path.join(TRAIN_DATASET_PATH, i)
+#                 data_path = os.path.join(case_path, f'{i}_flair.nii')
+#                 flair = nib.load(data_path).get_fdata()    
+#                 data_path = os.path.join(case_path, f'{i}_t1ce.nii')
+#                 ce = nib.load(data_path).get_fdata()
+#                 data_path = os.path.join(case_path, f'{i}_seg.nii')
+#                 seg = nib.load(data_path).get_fdata()
+
+#                 augmented_slice_X = np.stack([flair[:,:,j+VOLUME_START], ce[:,:,j+VOLUME_START]], axis=-1)
+#                 augmented_slice_Y = seg[:,:,j+VOLUME_START]
+
+#                 # Apply data augmentation only to the input image (X)
+#                 augmented_slice_X = datagen.random_transform(augmented_slice_X)
+
+#                 augmented_X.append(augmented_slice_X)
+#                 augmented_Y.append(augmented_slice_Y)
+
+#         augmented_X = np.array(augmented_X)
+#         augmented_Y = np.array(augmented_Y)
+
+#         y[y == 4] = 3
+#         mask = tf.one_hot(y, 4)
+#         Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
+#         return augmented_X / np.max(augmented_X), Y
 
 
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 16, n_channels = 2, shuffle=True):
+    def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
