@@ -1,4 +1,6 @@
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, Input, concatenate, Dropout, Activation, Attention
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, concatenate, Dropout, Activation, Attention
+import tensorflow.keras as tfk
+
 
 # class simpleUnet:
 #     '''simple unet model'''
@@ -62,24 +64,25 @@ class attUnet:
         self.input_layer = input_layer
         self.kernel = kernel
         self.dropout = dropout
+        self.generateLayers()
 
     def generateLayers(self):
         conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(self.input_layer)
         conv1 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv1)
 
-        mxpool = Maxmxpooling2D(mxpool_size=(2, 2))(conv1)
+        mxpool = MaxPooling2D(pool_size=(2, 2))(conv1)
         conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool)
         conv = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv)
 
-        mxpool1 = Maxmxpooling2D(mxpool_size=(2, 2))(conv)
+        mxpool1 = MaxPooling2D(pool_size=(2, 2))(conv)
         conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool1)
         conv2 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv2)
 
-        mxpool2 = Maxmxpooling2D(mxpool_size=(2, 2))(conv2)
+        mxpool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
         conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool2)
         conv3 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv3)
 
-        mxpool4 = Maxmxpooling2D(mxpool_size=(2, 2))(conv3)
+        mxpool4 = MaxPooling2D(pool_size=(2, 2))(conv3)
         conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(mxpool4)
         conv5 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer=self.kernel)(conv5)
         drop5 = Dropout(self.dropout)(conv5)
@@ -118,4 +121,4 @@ class attUnet:
 
         conv10 = Conv2D(4, (1, 1), activation='softmax')(conv)
 
-        return tf.keras.Model(input_layer = self.input_layer, outputs = conv10)
+        return tfk.Model(input_layer = self.input_layer, outputs = conv10)
