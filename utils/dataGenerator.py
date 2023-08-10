@@ -1,6 +1,10 @@
 import os
 from config import *
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
+import nibabel as nib
+import numpy as np
+from keras.utils import Sequence
 
 # lists of directories with studies
 train_and_val_directories = [f.path for f in os.scandir(TRAIN_DATASET_PATH) if f.is_dir()]
@@ -64,7 +68,7 @@ train_ids, test_ids = train_test_split(train_test_ids,test_size=0.15)
 
 
 
-class DataGenerator(keras.utils.Sequence):
+class DataGenerator(Sequence):
     'Generates data for Keras'
     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
         'Initialization'
@@ -130,9 +134,3 @@ class DataGenerator(keras.utils.Sequence):
         mask = tf.one_hot(y, 4)
         Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
         return X/np.max(X), Y
-    
-    
-        
-training_generator = DataGenerator(train_ids)
-valid_generator = DataGenerator(val_ids)
-test_generator = DataGenerator(test_ids)

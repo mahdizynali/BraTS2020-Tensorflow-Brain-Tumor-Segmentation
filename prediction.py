@@ -1,13 +1,21 @@
+import os
+from config import *
+from keras.callbacks import CSVLogger
+from utils.coEFFMatrix import machinLearningMatrix as ml
+import tensorflow as tf
+from keras.models import load_model
+import nibabel as nib
 
-model = keras.models.load_model(PRE_TRAINED_MODEL_PATH, 
+
+model = load_model(PRE_TRAINED_MODEL_PATH, 
                                    custom_objects={ 'accuracy' : tf.keras.metrics.MeanIoU(num_classes=4),
-                                                   "dice_coef": dice_coef,
-                                                   "precision": precision,
-                                                   "sensitivity":sensitivity,
-                                                   "specificity":specificity,
-                                                   "dice_coef_necrotic": dice_coef_necrotic,
-                                                   "dice_coef_edema": dice_coef_edema,
-                                                   "dice_coef_enhancing": dice_coef_enhancing
+                                                   "dice_coef": ml.dice_coef,
+                                                   "precision": ml.precision,
+                                                   "sensitivity":ml.sensitivity,
+                                                   "specificity":ml.specificity,
+                                                   "dice_coef_necrotic": ml.dice_coef_necrotic,
+                                                   "dice_coef_edema": ml.dice_coef_edema,
+                                                   "dice_coef_enhancing": ml.dice_coef_enhancing
                                                   }, compile=False)
 
 history = pd.read_csv(PRE_TRAINED_LOG_PATH, sep=',', engine='python')

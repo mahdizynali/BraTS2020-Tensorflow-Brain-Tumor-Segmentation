@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 import pandas as pd
@@ -14,18 +13,6 @@ from PIL import Image, ImageOps
 import nilearn as nl
 import nibabel as nib
 import nilearn.plotting as nlplt
-import keras
-
-from keras.callbacks import CSVLogger
-import tensorflow as tf
-from tensorflow.keras.utils import plot_model
-from sklearn.preprocessing import MinMaxScaler
-
-from sklearn.metrics import classification_report
-from tensorflow.keras.models import *
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping, TensorBoard
-from tensorflow.keras.layers.experimental import preprocessing
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -47,9 +34,9 @@ VOLUME_SLICES = 100
 VOLUME_START_AT = 22 # first slice of volume that we will include
 
 
-TRAIN_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
-VALIDATION_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData/'
-PRE_TRAINED_MODEL_PATH = '/home/maximum/Desktop/tf2/first_train/model-agust.h5'
+TRAIN_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_TrainingData/'
+VALIDATION_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_ValidationData/'
+PRE_TRAINED_MODEL_PATH = '/home/mahdi/Desktop/tf2/first_train/model-agust.h5'
 PRE_TRAINED_LOG_PATH = '/home/maximum/Desktop/tf2/first_train/training.log'
 
 IMG_SIZE=128
