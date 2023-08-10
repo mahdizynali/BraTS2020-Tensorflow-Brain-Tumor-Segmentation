@@ -32,3 +32,23 @@ import warnings
 warnings.filterwarnings('ignore')
 
 np.set_printoptions(precision=3, suppress=True)
+
+
+# existed classes
+SEGMENT_CLASSES = {
+    0 : 'NOT tumor',
+    1 : 'NECROTIC/CORE',
+    2 : 'EDEMA',
+    3 : 'ENHANCING'
+}
+
+# there are 155 slices per volume
+# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
+VOLUME_SLICES = 100 
+VOLUME_START_AT = 22 # first slice of volume that we will include
+
+
+TRAIN_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
+VALIDATION_DATASET_PATH = '/home/maximum/Desktop/tf2/archive/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData/'
+
+IMG_SIZE=128
