@@ -6,7 +6,8 @@ from AttentionUnet import attUnet
 import keras.backend as K
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping, TensorBoard
 
-from tensorflow.keras.utils import plot_model
+
+
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import classification_report
 # from tensorflow.keras.models import *

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import pandas as pd
+
 import seaborn as sns
 import glob
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from skimage.transform import rotate
 from skimage.transform import resize
 from PIL import Image, ImageOps  
 import nilearn as nl
-import nibabel as nib
+
 import nilearn.plotting as nlplt
 
 import warnings
