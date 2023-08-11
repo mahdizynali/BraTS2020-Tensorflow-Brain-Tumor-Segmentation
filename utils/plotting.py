@@ -1,5 +1,15 @@
+import os
+import sys
+import cv2
+import glob
+import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
+# set your codes base folder
+sys.path.append('../Tensorflow-Unet-Brain-Tumor-Segmentation')
+from config import VOLUME_START, VOLUME_SLICES, IMG_SIZE
+
+#======================================================
 
 SEGMENT_CLASSES = {
     0 : 'NOT tumor',
@@ -7,6 +17,8 @@ SEGMENT_CLASSES = {
     2 : 'EDEMA',
     3 : 'ENHANCING'
 }
+
+#======================================================
 
 # to run this section first : sudo apt install graphviz -y 
 # from tensorflow.keras.utils import plot_model
@@ -17,6 +29,8 @@ SEGMENT_CLASSES = {
 #            rankdir = 'TB', 
 #            expand_nested = False, 
 #            dpi = 70)
+
+#======================================================
 
 def trainingResults(hist, saveName):
     
@@ -53,11 +67,8 @@ def trainingResults(hist, saveName):
     plt.savefig(f"trainingResults/{saveName}.png")
     plt.show()
 
+#======================================================
 
-# there are 155 slices per volume
-# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
-VOLUME_SLICES = 100
-VOLUME_START = 20 # first slice of volume that we will include
 
 # mri type must one of 1) flair 2) t1 3) t1ce 4) t2 ------- or even 5) seg
 # returns volume of specified study at `path`
@@ -68,7 +79,7 @@ def imageLoader(path):
         X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(image[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
         X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
 
-        y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT]
+        y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START]
     return np.array(image)
 
 

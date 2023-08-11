@@ -3,11 +3,15 @@ warnings.filterwarnings('ignore')
 from tensorflow.keras import optimizers, metrics
 
 NUM_CLASSES=4
-IMG_SIZE=128
 TRAIN_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_TrainingData/'
 VALIDATION_DATASET_PATH = '/media/mahdi/individual/dataset/MICCAI_BraTS2020_ValidationData/'
 SAVE_MODEL_PATH = 'result-model.h5'
 SAVE_LOG_PATH = 'training.log'
+# there are 155 slices per volume
+# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
+VOLUME_SLICES = 100
+VOLUME_START = 20 
+IMG_SIZE = 128
 
 # if they are existed before:
 PRE_TRAINED_MODEL_PATH = '/home/mahdi/Desktop/tf2/first_train/model-agust.h5'

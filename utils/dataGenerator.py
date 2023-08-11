@@ -1,19 +1,15 @@
 import os
 import cv2
-from config import TRAIN_DATASET_PATH, IMG_SIZE
-from sklearn.model_selection import train_test_split
-import tensorflow as tf
-import nibabel as nib
 import numpy as np
-np.set_printoptions(precision=3, suppress=True)
+import nibabel as nib
+import tensorflow as tf
 from keras.utils import Sequence
-from skimage.transform import rotate, warp, AffineTransform
 from skimage.util import random_noise
+np.set_printoptions(precision=3, suppress=True)
+from sklearn.model_selection import train_test_split
+from skimage.transform import rotate, warp, AffineTransform
+from config import TRAIN_DATASET_PATH, IMG_SIZE, VOLUME_START, VOLUME_SLICES
 
-# there are 155 slices per volume
-# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
-VOLUME_SLICES = 100
-VOLUME_START = 20 # first slice of volume that we will include
 
 # lists of directories with studies
 train_and_val_directories = [f.path for f in os.scandir(TRAIN_DATASET_PATH) if f.is_dir()]
