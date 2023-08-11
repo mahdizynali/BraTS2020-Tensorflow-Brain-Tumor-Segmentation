@@ -2,10 +2,10 @@ import pandas as pd
 from config import *
 from utils.dataGenerator import *
 from keras.models import load_model
-from utils.plotting import trainingResults
+from utils.plotting import trainingResults, prediction
 from utils.coEFFMatrix import machinLearningMatrix as ml
 
-test_set = DataGenerator(test_ids, batch_size=HyperParameters.batchSize, n_channels=2, shuffle=True)
+testSet = DataGenerator(test_ids, batch_size=HyperParameters.batchSize, n_channels=2, shuffle=True)
 
 model = load_model(PRE_TRAINED_MODEL_PATH, 
     custom_objects={ 'accuracy' : HyperParameters.IoU,
@@ -20,3 +20,4 @@ model = load_model(PRE_TRAINED_MODEL_PATH,
 
 history = pd.read_csv(PRE_TRAINED_LOG_PATH, sep=',', engine='python')
 # trainingResults(history, "predictionModelResult")
+prediction(model, test_ids, caseNumber=3, start_slices=60)
