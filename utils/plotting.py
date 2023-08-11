@@ -8,9 +8,8 @@ SEGMENT_CLASSES = {
     3 : 'ENHANCING'
 }
 
-
+# to run this section first : sudo apt install graphviz -y 
 # from tensorflow.keras.utils import plot_model
-# '''to run this section first : sudo apt install graphviz -y'''
 # plot_model(model, 
 #            show_shapes = True,
 #            show_dtype=False,
@@ -18,7 +17,6 @@ SEGMENT_CLASSES = {
 #            rankdir = 'TB', 
 #            expand_nested = False, 
 #            dpi = 70)
-
 
 def trainingResults(hist, saveName):
     

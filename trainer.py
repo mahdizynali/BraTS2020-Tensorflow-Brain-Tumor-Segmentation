@@ -4,6 +4,7 @@ from utils.dataGenerator import *
 from keras.callbacks import CSVLogger
 from tensorflow.keras import callbacks
 from utils.coEFFMatrix import machinLearningMatrix as ml
+from utils.plotting import trainingResults
 from config import HyperParameters, IMG_SIZE, SAVE_LOG_PATH, SAVE_MODEL_PATH
 hyper = HyperParameters()
 
@@ -42,3 +43,4 @@ history =  model.fit(train_set, epochs=hyper.epochs, steps_per_epoch=hyper.steps
                      callbacks= cbacks, validation_data = valid_set)  
 
 model.save(SAVE_MODEL_PATH)
+trainingResults(history, "trainingModelResult")
