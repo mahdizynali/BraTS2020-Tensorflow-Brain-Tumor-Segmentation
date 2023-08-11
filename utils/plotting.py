@@ -103,7 +103,7 @@ class prediction:
 
     def displayPredictsById(self):
         for i in range (self.caseNumber) :
-            path = TRAIN_DATASET_PATH + f"/BraTS20_Training_{self.test_ids[i][-3:]}"
+            path = TRAIN_DATASET_PATH + f"BraTS20_Training_{self.test_ids[i][-3:]}"
             gt = nib.load(os.path.join(path, f'BraTS20_Training_{self.test_ids[i][-3:]}_seg.nii')).get_fdata()
             origImage = nib.load(os.path.join(path, f'BraTS20_Training_{self.test_ids[i][-3:]}_flair.nii')).get_fdata()
             matX = self.predictByPath(path, self.test_ids[i][-3:])
@@ -113,7 +113,7 @@ class prediction:
             edema= p[:,:,:,2]
             enhancing = p[:,:,:,3]
 
-            plt.figure(figsize=(18, 50))
+            # plt.figure(figsize=(10, 30))
             fig, axarr = plt.subplots(1, 6, figsize=(18, 50)) 
             fig.canvas.manager.set_window_title('prediction')
 
@@ -140,6 +140,7 @@ class prediction:
             axarr[5].imshow(enhancing[self.slices,:,], cmap="OrRd", interpolation='none', alpha=0.3)
             axarr[5].title.set_text(f'{SEGMENT_CLASSES[3]} predicted')
 
+            plt.savefig(f"predictResults/BraTS20_Training_{self.test_ids[i][-3:]}.png")
             plt.show()
 
 # mask = np.zeros((10,10))
