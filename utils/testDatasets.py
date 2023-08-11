@@ -5,9 +5,6 @@ from config import TRAIN_DATASET_PATH, VALIDATION_DATASET_PATH
 import matplotlib.pyplot as plt
 import nibabel as nib
 
-# test_set = DataGenerator(test_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
-
-
 train_image_flair=nib.load(TRAIN_DATASET_PATH + 'BraTS20_Training_005/BraTS20_Training_005_flair.nii').get_fdata()
 train_image_t1=nib.load(TRAIN_DATASET_PATH + 'BraTS20_Training_005/BraTS20_Training_005_t1.nii').get_fdata()
 train_image_t1ce=nib.load(TRAIN_DATASET_PATH + 'BraTS20_Training_005/BraTS20_Training_005_t1ce.nii').get_fdata()
