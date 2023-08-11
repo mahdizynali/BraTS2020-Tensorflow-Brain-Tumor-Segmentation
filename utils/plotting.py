@@ -1,4 +1,5 @@
 import nibabel as nib
+import matplotlib.pyplot as plt
 
 SEGMENT_CLASSES = {
     0 : 'NOT tumor',
@@ -7,7 +8,9 @@ SEGMENT_CLASSES = {
     3 : 'ENHANCING'
 }
 
+
 # from tensorflow.keras.utils import plot_model
+# '''to run this section first : sudo apt install graphviz -y'''
 # plot_model(model, 
 #            show_shapes = True,
 #            show_dtype=False,
@@ -17,41 +20,46 @@ SEGMENT_CLASSES = {
 #            dpi = 70)
 
 
-hist=history.history
+def trainingResults(hist, saveName):
+    
+    acc=hist['accuracy']
+    val_acc=hist['val_accuracy']
 
-acc=hist['accuracy']
-val_acc=hist['val_accuracy']
+    epoch=range(len(acc))
 
-epoch=range(len(acc))
+    loss=hist['loss']
+    val_loss=hist['val_loss']
 
-loss=hist['loss']
-val_loss=hist['val_loss']
+    train_dice=hist['dice_coef']
+    val_dice=hist['val_dice_coef']
 
-train_dice=hist['dice_coef']
-val_dice=hist['val_dice_coef']
+    fig,ax=plt.subplots(1,4,figsize=(16,8))
+    fig.canvas.manager.set_window_title('Training Results')
 
-f,ax=plt.subplots(1,4,figsize=(16,8))
+    ax[0].plot(epoch,acc,'g',label='Training Accuracy')
+    ax[0].plot(epoch,val_acc,'b',label='Validation Accuracy')
+    ax[0].legend()
 
-ax[0].plot(epoch,acc,'b',label='Training Accuracy')
-ax[0].plot(epoch,val_acc,'r',label='Validation Accuracy')
-ax[0].legend()
+    ax[1].plot(epoch,loss,'b',label='Training Loss')
+    ax[1].plot(epoch,val_loss,'r',label='Validation Loss')
+    ax[1].legend()
 
-ax[1].plot(epoch,loss,'b',label='Training Loss')
-ax[1].plot(epoch,val_loss,'r',label='Validation Loss')
-ax[1].legend()
+    ax[2].plot(epoch,train_dice,'b',label='Training dice coef')
+    ax[2].plot(epoch,val_dice,'r',label='Validation dice coef')
+    ax[2].legend()
 
-ax[2].plot(epoch,train_dice,'b',label='Training dice coef')
-ax[2].plot(epoch,val_dice,'r',label='Validation dice coef')
-ax[2].legend()
+    ax[3].plot(epoch,hist['mean_io_u'],'b',label='Training mean IOU')
+    ax[3].plot(epoch,hist['val_mean_io_u'],'r',label='Validation mean IOU')
+    ax[3].legend()
 
-ax[3].plot(epoch,hist['mean_io_u'],'b',label='Training mean IOU')
-ax[3].plot(epoch,hist['val_mean_io_u'],'r',label='Validation mean IOU')
-ax[3].legend()
-
-plt.show()
-
+    plt.savefig(f"trainingResults/{saveName}.png")
+    plt.show()
 
 
+# there are 155 slices per volume
+# to start at 5 and use 145 slices means we will skip the first 5 and last 5 
+VOLUME_SLICES = 100
+VOLUME_START = 20 # first slice of volume that we will include
 
 # mri type must one of 1) flair 2) t1 3) t1ce 4) t2 ------- or even 5) seg
 # returns volume of specified study at `path`
@@ -59,8 +67,8 @@ def imageLoader(path):
     image = nib.load(path).get_fdata()
     X = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, self.n_channels))
     for j in range(VOLUME_SLICES):
-        X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(image[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE))
-        X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE))
+        X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(image[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
+        X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
 
         y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT]
     return np.array(image)
@@ -102,8 +110,8 @@ def predictByPath(case_path,case):
 
     
     for j in range(VOLUME_SLICES):
-        X[j,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START_AT], (IMG_SIZE,IMG_SIZE))
-        X[j,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START_AT], (IMG_SIZE,IMG_SIZE))
+        X[j,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START], (IMG_SIZE,IMG_SIZE))
+        X[j,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE,IMG_SIZE))
  #       y[j,:,:] = cv2.resize(seg[:,:,j+VOLUME_START_AT], (IMG_SIZE,IMG_SIZE))
         
   #  model.evaluate(x=X,y=y[:,:,:,0], callbacks= callbacks)
@@ -124,11 +132,11 @@ def showPredictsById(case, start_slice = 50):
     f, axarr = plt.subplots(1,6, figsize = (18, 50)) 
 
     for i in range(6): # for each image, add brain background
-        axarr[i].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE)), cmap="gray", interpolation='none')
+        axarr[i].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START], (IMG_SIZE, IMG_SIZE)), cmap="gray", interpolation='none')
     
-    axarr[0].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE)), cmap="gray")
+    axarr[0].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START], (IMG_SIZE, IMG_SIZE)), cmap="gray")
     axarr[0].title.set_text('Original image flair')
-    curr_gt=cv2.resize(gt[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE), interpolation = cv2.INTER_NEAREST)
+    curr_gt=cv2.resize(gt[:,:,start_slice+VOLUME_START], (IMG_SIZE, IMG_SIZE), interpolation = cv2.INTER_NEAREST)
     axarr[1].imshow(curr_gt, cmap="Reds", interpolation='none', alpha=0.3) # ,alpha=0.3,cmap='Reds'
     axarr[1].title.set_text('Ground truth')
     axarr[2].imshow(p[start_slice,:,:,1:4], cmap="Reds", interpolation='none', alpha=0.3)
@@ -142,9 +150,9 @@ def showPredictsById(case, start_slice = 50):
     plt.show()
     
     
-showPredictsById(case=test_ids[0][-3:])
-showPredictsById(case=test_ids[1][-3:])
-showPredictsById(case=test_ids[2][-3:])
+# showPredictsById(case=test_ids[0][-3:])
+# showPredictsById(case=test_ids[1][-3:])
+# showPredictsById(case=test_ids[2][-3:])
 # showPredictsById(case=test_ids[3][-3:])
 # showPredictsById(case=test_ids[4][-3:])
 # showPredictsById(case=test_ids[5][-3:])
