@@ -11,7 +11,7 @@ SAVE_LOG_PATH = 'training.log'
 
 # if they are existed before:
 PRE_TRAINED_MODEL_PATH = '/home/mahdi/Desktop/tf2/first_train/model-agust.h5'
-PRE_TRAINED_LOG_PATH = '/home/maximum/Desktop/tf2/first_train/training.log'
+PRE_TRAINED_LOG_PATH = '/home/mahdi/Desktop/tf2/first_train/training.log'
 
 
 class HyperParameters:

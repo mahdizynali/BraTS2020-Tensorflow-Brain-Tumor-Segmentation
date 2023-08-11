@@ -1,6 +1,6 @@
 import os
 import cv2
-from config import TRAIN_DATASET_PATH, VALIDATION_DATASET_PATH, IMG_SIZE
+from config import TRAIN_DATASET_PATH, IMG_SIZE
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import nibabel as nib

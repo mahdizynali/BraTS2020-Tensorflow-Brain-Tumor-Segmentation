@@ -1,13 +1,14 @@
 import pandas as pd
+from config import *
 import tensorflow as tf
+from utils.dataGenerator import *
 from keras.models import load_model
 from utils.coEFFMatrix import machinLearningMatrix as ml
-from config import PRE_TRAINED_LOG_PATH, PRE_TRAINED_MODEL_PATH
 
-# test_set = DataGenerator(test_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
+test_set = DataGenerator(test_ids, batch_size=HyperParameters.batchSize, n_channels=2, shuffle=True)
 
 model = load_model(PRE_TRAINED_MODEL_PATH, 
-                                   custom_objects={ 'accuracy' : tf.keras.metrics.MeanIoU(num_classes=4),
+                                   custom_objects={ 'accuracy' : HyperParameters.IoU,
                                                    "dice_coef": ml.dice_coef,
                                                    "precision": ml.precision,
                                                    "sensitivity":ml.sensitivity,
