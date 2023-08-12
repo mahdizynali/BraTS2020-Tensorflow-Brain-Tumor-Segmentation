@@ -9,6 +9,7 @@ np.set_printoptions(precision=3, suppress=True)
 from sklearn.model_selection import train_test_split
 from skimage.transform import rotate, warp, AffineTransform
 from config import TRAIN_DATASET_PATH, IMG_SIZE, VOLUME_START, VOLUME_SLICES
+import matplotlib.pyplot as plt
 
 
 # lists of directories with studies
@@ -60,60 +61,74 @@ class DataGenerator(Sequence):
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
-    def augmentation(self, image):
-        # Apply rotation
-        angle = np.random.uniform(-20, 20)
-        image = rotate(image, angle, mode='reflect', preserve_range=True)
-        
-        # Apply affine transformation for shear and zoom
-        transform = AffineTransform(
-            rotation=np.deg2rad(angle),
-            shear=np.random.uniform(-0.2, 0.2),
-            scale=(1 + np.random.uniform(-0.2, 0.2), 1 + np.random.uniform(-0.2, 0.2))
-        )
-        image = warp(image, transform.inverse, mode='reflect', preserve_range=True)
-
-        # Apply random noise
-        image = random_noise(image, var=0.01)
-
-        # Apply horizontal flip
-        if np.random.rand() < 0.5:
-            image = np.fliplr(image)
-
-        return image
-
-
     def __data_generation(self, Batch_ids):
-        'Generates data containing batch_size samples'  # X : (n_samples, *dim, n_channels)
+        'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
         # Initialization
-        X = np.zeros((self.batch_size * VOLUME_SLICES, *self.dim, self.n_channels))
-        y = np.zeros((self.batch_size * VOLUME_SLICES, 240, 240))
-        Y = np.zeros((self.batch_size * VOLUME_SLICES, *self.dim, 4))
+        X = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, self.n_channels))
+        y = np.zeros((self.batch_size*VOLUME_SLICES, 240, 240))
+        Y = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, 4))
 
-        # Generate data
+        
+        # # Generate data
+        # for c, i in enumerate(Batch_ids):
+        #     case_path = os.path.join(TRAIN_DATASET_PATH, i)
+
+        #     data_path = os.path.join(case_path, f'{i}_flair.nii');
+        #     flair = nib.load(data_path).get_fdata()    
+
+        #     data_path = os.path.join(case_path, f'{i}_t1ce.nii');
+        #     ce = nib.load(data_path).get_fdata()
+            
+        #     data_path = os.path.join(case_path, f'{i}_seg.nii');
+        #     seg = nib.load(data_path).get_fdata()
+        
+        #     for j in range(VOLUME_SLICES):
+        #          X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE));
+        #          X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE));
+
+        #          y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START];
+                    
+        # # Generate masks
+        # y[y==4] = 3;
+        # mask = tf.one_hot(y, 4);
+        # Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE));
+        # return X/np.max(X), Y
+
         for c, i in enumerate(Batch_ids):
             case_path = os.path.join(TRAIN_DATASET_PATH, i)
 
-            data_path = os.path.join(case_path, f'{i}_flair.nii')
-            flair = nib.load(data_path).get_fdata()
+            data_path = os.path.join(case_path, f'{i}_flair.nii');
+            flair = nib.load(data_path).get_fdata()    
 
-            data_path = os.path.join(case_path, f'{i}_t1ce.nii')
+            data_path = os.path.join(case_path, f'{i}_t1ce.nii');
             ce = nib.load(data_path).get_fdata()
 
-            data_path = os.path.join(case_path, f'{i}_seg.nii')
+            data_path = os.path.join(case_path, f'{i}_t2.nii'); 
+            t2 = nib.load(data_path).get_fdata()
+            
+            data_path = os.path.join(case_path, f'{i}_seg.nii');
             seg = nib.load(data_path).get_fdata()
 
+            #seg=seg.astype(np.uint8)
+            #seg[seg==4] = 3
+
+            #temp_combined_images = np.stack([flair, ce, t2], axis=3)
+            #temp_combined_images=temp_combined_images[56:184, 56:184, 13:141]
+            #temp_mask = seg[56:184, 56:184, 13:141]
+            
+            slice_w = 25
+
             for j in range(VOLUME_SLICES):
-                augmented_flair = self.augmentation(flair[:, :, j + VOLUME_START])
-                augmented_ce = self.augmentation(ce[:, :, j + VOLUME_START])
+                X[j +VOLUME_SLICES*c,:,:,:,0] = cv2.resize(flair[:,:,flair.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
+                X[j +VOLUME_SLICES*c,:,:,:,1] = cv2.resize(ce[:,:,ce.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
+                X[j +VOLUME_SLICES*c,:,:,:,2] = cv2.resize(t2[:,:,t2.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
 
-                X[j + VOLUME_SLICES * c, :, :, 0] = cv2.resize(augmented_flair, (IMG_SIZE, IMG_SIZE))
-                X[j + VOLUME_SLICES * c, :, :, 1] = cv2.resize(augmented_ce, (IMG_SIZE, IMG_SIZE))
-
-                y[j + VOLUME_SLICES * c] = seg[:, :, j + VOLUME_START]
-
+                #y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT];
+                Y[j +VOLUME_SLICES*c,:,:,:] = cv2.resize(seg[:,:,seg.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
+                    
         # Generate masks
-        y[y == 4] = 3
-        mask = tf.one_hot(y, 4)
-        Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
-        return X / np.max(X), Y
+        #y[y==4] = 3;
+        Y[Y==4] = 3;
+        mask = tf.one_hot(Y, 4);
+        #Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE));
+        return X/np.max(X), mask
