@@ -9,7 +9,8 @@ np.set_printoptions(precision=3, suppress=True)
 from sklearn.model_selection import train_test_split
 from skimage.transform import rotate, warp, AffineTransform
 from config import TRAIN_DATASET_PATH, IMG_SIZE, VOLUME_START, VOLUME_SLICES
-import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
 
 
 # lists of directories with studies
@@ -26,17 +27,16 @@ train_and_test_ids = path_to_ids(train_and_val_directories);
 train_test_ids, val_ids = train_test_split(train_and_test_ids, test_size=0.2) 
 train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15) 
 
-
 class DataGenerator(Sequence):
-    'Generates and augment data for training'
+    'Generates data for Keras'
     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
         self.list_IDs = list_IDs
         self.n_channels = n_channels
-        self.shuffle = shuffle
-        self.on_epoch_end()
+        if shuffle == True :
+            self.augment_shuffle()
 
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -55,11 +55,14 @@ class DataGenerator(Sequence):
 
         return X, y
 
-    def on_epoch_end(self):
-        'Updates indexes after each epoch'
+    def augment_shuffle(self):
         self.indexes = np.arange(len(self.list_IDs))
-        if self.shuffle == True:
-            np.random.shuffle(self.indexes)
+        np.random.shuffle(self.indexes)
+    
+    def augment_transform(self, data):
+        data = scaler.fit_transform(
+                data.reshape(-1, data.shape[-1])).reshape(data.shape)    
+        return data    
 
     def __data_generation(self, Batch_ids):
         'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
@@ -69,66 +72,30 @@ class DataGenerator(Sequence):
         Y = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, 4))
 
         
-        # # Generate data
-        # for c, i in enumerate(Batch_ids):
-        #     case_path = os.path.join(TRAIN_DATASET_PATH, i)
-
-        #     data_path = os.path.join(case_path, f'{i}_flair.nii');
-        #     flair = nib.load(data_path).get_fdata()    
-
-        #     data_path = os.path.join(case_path, f'{i}_t1ce.nii');
-        #     ce = nib.load(data_path).get_fdata()
-            
-        #     data_path = os.path.join(case_path, f'{i}_seg.nii');
-        #     seg = nib.load(data_path).get_fdata()
-        
-        #     for j in range(VOLUME_SLICES):
-        #          X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE));
-        #          X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE));
-
-        #          y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START];
-                    
-        # # Generate masks
-        # y[y==4] = 3;
-        # mask = tf.one_hot(y, 4);
-        # Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE));
-        # return X/np.max(X), Y
-
+        # Generate data
         for c, i in enumerate(Batch_ids):
             case_path = os.path.join(TRAIN_DATASET_PATH, i)
 
-            data_path = os.path.join(case_path, f'{i}_flair.nii');
+            data_path = os.path.join(case_path, f'{i}_flair.nii')
             flair = nib.load(data_path).get_fdata()    
+            flair = self.augment_transform(flair)
 
-            data_path = os.path.join(case_path, f'{i}_t1ce.nii');
+            data_path = os.path.join(case_path, f'{i}_t1ce.nii')
             ce = nib.load(data_path).get_fdata()
-
-            data_path = os.path.join(case_path, f'{i}_t2.nii'); 
-            t2 = nib.load(data_path).get_fdata()
+            ce = self.augment_transform(ce)
             
-            data_path = os.path.join(case_path, f'{i}_seg.nii');
+            data_path = os.path.join(case_path, f'{i}_seg.nii')
             seg = nib.load(data_path).get_fdata()
-
-            #seg=seg.astype(np.uint8)
-            #seg[seg==4] = 3
-
-            #temp_combined_images = np.stack([flair, ce, t2], axis=3)
-            #temp_combined_images=temp_combined_images[56:184, 56:184, 13:141]
-            #temp_mask = seg[56:184, 56:184, 13:141]
-            
-            slice_w = 25
-
+            seg = self.augment_transform(seg)
+        
             for j in range(VOLUME_SLICES):
-                X[j +VOLUME_SLICES*c,:,:,:,0] = cv2.resize(flair[:,:,flair.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
-                X[j +VOLUME_SLICES*c,:,:,:,1] = cv2.resize(ce[:,:,ce.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
-                X[j +VOLUME_SLICES*c,:,:,:,2] = cv2.resize(t2[:,:,t2.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
+                 X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
+                 X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START], (IMG_SIZE, IMG_SIZE))
 
-                #y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT];
-                Y[j +VOLUME_SLICES*c,:,:,:] = cv2.resize(seg[:,:,seg.shape[0]//2-slice_w+j], (IMG_SIZE, IMG_SIZE));
+                 y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START]
                     
         # Generate masks
-        #y[y==4] = 3;
-        Y[Y==4] = 3;
-        mask = tf.one_hot(Y, 4);
-        #Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE));
-        return X/np.max(X), mask
+        y[y==4] = 3
+        mask = tf.one_hot(y, 4)
+        Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
+        return X/np.max(X), Y
