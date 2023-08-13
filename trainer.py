@@ -1,5 +1,5 @@
 import keras.backend as K
-from AttentionUnet import attUnet
+from AttentionUnet import testUnet
 from utils.dataGenerator import *
 from keras.callbacks import CSVLogger
 from tensorflow.keras import callbacks
@@ -8,10 +8,10 @@ from utils.plotting import trainingResults
 from config import HyperParameters, IMG_SIZE, SAVE_LOG_PATH, SAVE_MODEL_PATH
 hyper = HyperParameters()
 
-train_set = DataGenerator(train_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
-valid_set = DataGenerator(val_ids, batch_size=hyper.batchSize, n_channels=2, shuffle=True)
+train_set = DataGenerator(train_ids, batch_size=hyper.batchSize, n_channels=2, augment=False, shuffle=True)
+valid_set = DataGenerator(val_ids, batch_size=hyper.batchSize, n_channels=2, augment=False, shuffle=True)
 
-model = attUnet((IMG_SIZE, IMG_SIZE, 2), hyper.modelKernel, hyper.modelDropout).generateModel()
+model = testUnet((IMG_SIZE, IMG_SIZE, 2), hyper.modelKernel, hyper.modelDropout).generateModel()
 model.compile(
     loss=hyper.lossFunction,
     optimizer=hyper.optimizer,
@@ -43,4 +43,4 @@ history =  model.fit(train_set, epochs=hyper.epochs, steps_per_epoch=hyper.steps
                      callbacks= cbacks, validation_data = valid_set)  
 
 model.save(SAVE_MODEL_PATH)
-trainingResults(history, "trainingModelResult")
+# trainingResults(history, "trainingModelResult")
