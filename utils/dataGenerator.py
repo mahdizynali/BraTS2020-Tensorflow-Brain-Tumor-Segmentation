@@ -10,6 +10,7 @@ from skimage.transform import rotate, warp, AffineTransform
 from config import TRAIN_DATASET_PATH, IMG_SIZE, VOLUME_START, VOLUME_SLICES
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
+import matplotlib.pyplot as plt
 
 
 # lists of directories with studies
@@ -28,12 +29,13 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
 
 # class DataGenerator(Sequence):
 #     'Generates data for Keras'
-#     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, shuffle=True):
+#     def __init__(self, list_IDs, dim=(IMG_SIZE,IMG_SIZE), batch_size = 1, n_channels = 2, augment=False, shuffle=True):
 #         'Initialization'
 #         self.dim = dim
 #         self.batch_size = batch_size
 #         self.list_IDs = list_IDs
 #         self.n_channels = n_channels
+#         self.augment = augment
 #         if shuffle == True :
 #             self.augment_shuffle()
 
@@ -73,6 +75,7 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
         
 #         # Generate data
 #         for c, i in enumerate(Batch_ids):
+
 #             case_path = os.path.join(TRAIN_DATASET_PATH, i)
 
 #             data_path = os.path.join(case_path, f'{i}_flair.nii')
@@ -97,6 +100,18 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
 #         y[y==4] = 3
 #         mask = tf.one_hot(y, 4)
 #         Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
+
+#         # Plot some example slices from the generated data
+#         fig, axes = plt.subplots(2, VOLUME_SLICES, figsize=(15, 5))
+#         for j in range(VOLUME_SLICES):
+#             axes[0, j].imshow(X[j, :, :, 0], cmap='gray')
+#             axes[0, j].set_title(f'Flair Slice {j}')
+
+#             axes[1, j].imshow(y[j], cmap='jet', vmin=0, vmax=3)
+#             axes[1, j].set_title(f'Segmentation Slice {j}')
+
+#         plt.show()
+
 #         return X/np.max(X), Y
 
 
@@ -105,15 +120,18 @@ from skimage.transform import resize
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, dim=(IMG_SIZE, IMG_SIZE), batch_size=1, n_channels=2, shuffle=True):
+    def __init__(self, list_IDs, dim=(IMG_SIZE, IMG_SIZE), batch_size=1, n_channels=2, augment=False, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
         self.list_IDs = list_IDs
         self.n_channels = n_channels
         self.shuffle = shuffle
+        self.augment = augment
         if shuffle:
             self.augment_shuffle()
+        if self.augment:
+            self.datagen = self.generate_augment_params()
 
         self.augmentation_generator = ImageDataGenerator(
             rotation_range=20,
@@ -147,8 +165,18 @@ class DataGenerator(Sequence):
         self.indexes = np.arange(len(self.list_IDs))
         np.random.shuffle(self.indexes)
 
-    def augment_transform(self, data):
-        return self.augmentation_generator.random_transform(data)
+    def generate_augment_params(self):
+        datagen = ImageDataGenerator(
+            rotation_range=15,
+            width_shift_range=0.1,
+            height_shift_range=0.1,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True,
+            fill_mode='nearest'
+        )
+        return datagen
+
 
     def __data_generation(self, Batch_ids):
         'Generates data containing batch_size samples'  # X : (n_samples, *dim, n_channels)
@@ -163,27 +191,51 @@ class DataGenerator(Sequence):
 
             data_path = os.path.join(case_path, f'{i}_flair.nii')
             flair = nib.load(data_path).get_fdata()
-            flair = self.augment_transform(flair)
-            flair = resize(flair, self.dim)
 
             data_path = os.path.join(case_path, f'{i}_t1ce.nii')
             ce = nib.load(data_path).get_fdata()
-            ce = self.augment_transform(ce)
-            ce = resize(ce, self.dim)
 
             data_path = os.path.join(case_path, f'{i}_seg.nii')
             seg = nib.load(data_path).get_fdata()
-            seg = self.augment_transform(seg)
+
+            ce = resize(ce, self.dim)
+            flair = resize(flair, self.dim)
             seg = resize(seg, self.dim)
+
+            if self.augment:
+                augment_params = self.datagen.get_random_transform(flair.shape)
+                flair = self.datagen.apply_transform(flair, augment_params)
+                ce = self.datagen.apply_transform(ce, augment_params)
+                seg = self.datagen.apply_transform(seg, augment_params)
 
             for j in range(VOLUME_SLICES):
                 X[j + VOLUME_SLICES * c, :, :, 0] = flair[:, :, j + VOLUME_START]
                 X[j + VOLUME_SLICES * c, :, :, 1] = ce[:, :, j + VOLUME_START]
-
                 y[j + VOLUME_SLICES * c] = seg[:, :, j + VOLUME_START]
 
         # Generate masks
         y[y == 4] = 3
         mask = tf.one_hot(y, 4)
         Y = tf.image.resize(mask, self.dim)
+
         return X / np.max(X), Y
+
+    def plot_augmented_sample(self, index):
+        X, Y = self.__getitem__(index)
+        
+        for i in range(self.batch_size * VOLUME_SLICES):
+            plt.figure(figsize=(10, 5))
+            
+            plt.subplot(1, 3, 1)
+            plt.imshow(X[i, :, :, 0], cmap='gray')
+            plt.title('FLAIR Image')
+            
+            plt.subplot(1, 3, 2)
+            plt.imshow(X[i, :, :, 1], cmap='gray')
+            plt.title('CE Image')
+            
+            plt.subplot(1, 3, 3)
+            plt.imshow(np.argmax(Y[i], axis=-1), cmap='tab20b')
+            plt.title('Segmentation Mask')
+            
+            plt.show()
