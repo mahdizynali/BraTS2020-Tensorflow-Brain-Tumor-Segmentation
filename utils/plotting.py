@@ -64,7 +64,7 @@ def trainingResults(hist, saveName):
     ax[3].plot(epoch,hist['val_mean_io_u'],'r',label='Validation mean IOU')
     ax[3].legend()
 
-    plt.savefig(f"trainingResults/{saveName}.png")
+    plt.savefig(f"{saveName}.png")
     plt.show()
 
 #======================================================

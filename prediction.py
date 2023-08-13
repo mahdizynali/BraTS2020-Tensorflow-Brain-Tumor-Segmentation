@@ -19,5 +19,5 @@ model = load_model(PRE_TRAINED_MODEL_PATH,
 }, compile=False)
 
 history = pd.read_csv(PRE_TRAINED_LOG_PATH, sep=',', engine='python')
-# trainingResults(history, "predictionModelResult")
-prediction(model, test_ids, caseNumber=3, start_slices=60) # TODO = random dataset initiate
+trainingResults(history, "predictionModelResult")
+prediction(model, test_ids, caseNumber=3, start_slices=40) # TODO = random dataset initiate
