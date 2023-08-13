@@ -11,6 +11,8 @@ from config import TRAIN_DATASET_PATH, IMG_SIZE, VOLUME_START, VOLUME_SLICES
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 import matplotlib.pyplot as plt
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from skimage.transform import resize
 
 
 # lists of directories with studies
@@ -113,10 +115,6 @@ train_ids, test_ids = train_test_split(train_test_ids, test_size=0.15)
 #         plt.show()
 
 #         return X/np.max(X), Y
-
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from skimage.transform import resize
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
