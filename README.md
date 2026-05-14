@@ -206,15 +206,6 @@ Fill this section after training.
 | Necrotic / Core tumor | `TODO` |
 | Edema | `TODO` |
 | Enhancing tumor | `TODO` |
-
-### Training Curves
-
-Add your training curves here after training:
-
-```md
-![Training Results](./trainingResults/training-result.png)
-```
-
 ---
 
 ## Metrics
